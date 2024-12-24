@@ -1,0 +1,31 @@
+{
+  "name": "backend-repo",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "NODE_ENV=production node ./dist/src/index.js",
+    "dev": "NODE_ENV=development nodemon"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "concurrently": "^9.1.0",
+    "nodemon": "^3.1.9",
+    "typescript": "^5.7.2",
+    "shared-utils": "workspace:*"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "firebase": "^11.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "ts-node": "^10.9.2"
+  }
+}
