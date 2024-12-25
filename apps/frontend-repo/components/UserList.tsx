@@ -26,10 +26,6 @@ const UserList = () => {
         (appState: AppState) => appState.userState.users
     );
 
-    const error = useSelector(
-        (appState: AppState) => appState.userState.error
-    );
-
     useEffect(() => {
         try {
             const token = localStorage.getItem('token');
