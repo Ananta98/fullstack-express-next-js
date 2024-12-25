@@ -11,6 +11,7 @@ import { AppState } from '../store/store';
 import { useEffect } from 'react';
 import { loadUserList } from '../store/actions';
 import { useRouter } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode';
 
 const UserList = () => {
     const router = useRouter()
@@ -30,14 +31,22 @@ const UserList = () => {
     );
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            router.push('/sign-in');
-        }
-        dispatch(loadUserList(token ?? ""));
-        if (error) {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                router.push('/sign-in');
+            }
+            const decodedToken: any = jwtDecode(token ?? "");
+            const currentTime = Date.now() / 1000;
+            if (decodedToken.exp < currentTime) {
+                localStorage.removeItem('token');
+                router.push('/sign-in');
+                return;
+            }
+            dispatch(loadUserList(token ?? ""));
+        } catch (error) {
             console.error("Error fetching users:", error);
-            router.push('/sign-in'); // Redirect to sign-in page if error occurs.
+            router.push('/sign-in');
         }
     }, []);
 

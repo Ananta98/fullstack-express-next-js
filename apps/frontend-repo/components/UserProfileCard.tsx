@@ -9,6 +9,7 @@ import { UserState } from '../store/types';
 import { AnyAction } from '@reduxjs/toolkit';
 import { loadUserProfile } from '../store/actions';
 import { useRouter } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode';
 
 const UserProfileCard = () => {
     const router = useRouter()
@@ -23,19 +24,23 @@ const UserProfileCard = () => {
         (appState: AppState) => appState.userState.user
     );
 
-    const error = useSelector(
-        (appState: AppState) => appState.userState.error
-    );
-
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
+        try {
+            const token = localStorage.getItem('token');
+            if (token === undefined) {
+                router.push('/sign-in');
+            }
+            const decodedToken: any = jwtDecode(token ?? "");
+            const currentTime = Date.now() / 1000;
+            if (decodedToken.exp < currentTime) {
+                localStorage.removeItem('token');
+                router.push('/sign-in');
+                return;
+            }
+            dispatch(loadUserProfile(token ?? ""));
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
             router.push('/sign-in');
-        }
-        dispatch(loadUserProfile(token ?? ""));
-        if (error) {
-            console.error("Error fetching users:", error);
-            router.push('/sign-in'); // Redirect to sign-in page if error occurs.
         }
     }, []);
 
@@ -46,18 +51,6 @@ const UserProfileCard = () => {
                 <div className="center-page">
                     <span className="spinner primary"></span>
                     <p>Loading...</p>
-                </div>
-            )}
-
-            {error && (
-                <div className="row">
-                    <div className="card large error">
-                        <section>
-                            <p>
-                                <span className="icon-alert inverse"></span> {error}
-                            </p>
-                        </section>
-                    </div>
                 </div>
             )}
 
